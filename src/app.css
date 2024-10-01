@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer {
+    /* DePixel fonts */
+    @font-face {
+        font-family: 'DePixelBreit';
+        src: url('/fonts/depixel/DePixelBreit.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'DePixelBreit';
+        src: url('/fonts/depixel/DePixelBreitFett.ttf') format('truetype');
+        font-weight: bold;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'DePixelIllegible';
+        src: url('/fonts/depixel/DePixelIllegible.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    /* Jersey15 font */
+    @font-face {
+        font-family: 'Jersey15';
+        src: url('/fonts/jersey15/Jersey15-Regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    /* Joystix font */
+    @font-face {
+        font-family: 'Joystix';
+        src: url('/fonts/joystix/joystix%20monospace.otf') format('opentype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    /* Mojang fonts */
+    @font-face {
+        font-family: 'Mojang';
+        src: url('/fonts/mojang/Mojang-Regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Mojang';
+        src: url('/fonts/mojang/Mojang-Bold.ttf') format('truetype');
+        font-weight: bold;
+        font-style: normal;
+    }
+
+    /* Pixelated font */
+    @font-face {
+        font-family: 'Pixelated';
+        src: url('/fonts/pixelated/pixelated.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    /* Pixeloid fonts */
+    @font-face {
+        font-family: 'PixeloidMono';
+        src: url('/fonts/pixeloid/PixeloidMono.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'PixeloidSans';
+        src: url('/fonts/pixeloid/PixeloidSans.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'PixeloidSansBold';
+        src: url('/fonts/pixeloid/PixeloidSansBold.ttf') format('truetype');
+        font-weight: bold;
+        font-style: normal;
+    }
+
+    /* Retro Gaming font */
+    @font-face {
+        font-family: 'RetroGaming';
+        src: url('/fonts/retro_gaming/Retro%20Gaming.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    /* Silkscreen fonts */
+    @font-face {
+        font-family: 'Silkscreen';
+        src: url('/fonts/silkscreen/slkscr.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Silkscreen';
+        src: url('/fonts/silkscreen/slkscrb.ttf') format('truetype');
+        font-weight: bold;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Silkscreen';
+        src: url('/fonts/silkscreen/slkscre.ttf') format('truetype');
+        font-weight: normal;
+        font-style: italic;
+    }
+
+    @font-face {
+        font-family: 'Silkscreen';
+        src: url('/fonts/silkscreen/slkscreb.ttf') format('truetype');
+        font-weight: bold;
+        font-style: italic;
+    }
+
+    /* Tiny5 font */
+    @font-face {
+        font-family: 'Tiny5';
+        src: url('/fonts/tiny5/Tiny5-Regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+}
+
+h2 {
+    font-family: "Silkscreen", sans-serif;
+    font-weight: 700;
+}
