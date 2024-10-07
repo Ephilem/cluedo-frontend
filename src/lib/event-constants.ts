@@ -94,6 +94,10 @@ export interface AssumptionsListPayload {
     assumptions: AssumptionInfo[];
 }
 
+export interface GameWonPayload {
+    winnerId: string;
+}
+
 // Constants
 export const GameEvents = {
     PLAYER_JOINED: 'playerJoined' as const,
@@ -118,6 +122,8 @@ export const GameEvents = {
     MOVE_SUSPECT: 'moveSuspect' as const,
     SHOW_PLATO: 'showPlato' as const,
     END_TURN: 'endTurn' as const,
+
+    GAME_WON: 'gameWon' as const,
     CURRENT_TURN: 'currentTurn' as const,
     MAKE_ASSUPMTION: 'makeAssumption' as const,
     DISPROVE_HYPOTHESIS: 'disproveHypothesis' as const,
@@ -156,4 +162,6 @@ export type GameEventMap = {
     [GameEvents.NEED_TO_DISPROVE_ASSUMPTION]: NeedToDisproveAssumptionPayload;
     [GameEvents.GET_ASSUMPTIONS_LIST]: RecieveEventBasePayload;
     [GameEvents.ASSUMPTIONS_LIST]: AssumptionsListPayload;
+    [GameEvents.GAME_WON]: GameWonPayload;
 };
+

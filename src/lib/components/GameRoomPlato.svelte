@@ -4,7 +4,7 @@
     import CardsDeck from "$lib/components/game/CardsDeck.svelte";
     import Board from "$lib/components/game/Board.svelte";
     import {Button} from "$lib/components/ui/button";
-    import {getContext, setContext} from "svelte";
+    import {getContext, onMount, setContext} from "svelte";
     import {writable} from "svelte/store";
     import {gameStore, updaterNextTurn} from "$lib/stores/gameStore";
     import {playerMe, playersNeedToDisprove, playerStore} from "$lib/stores/playerStore";
@@ -19,6 +19,7 @@
     import {currentAssumptionToDisprove} from "$lib/stores/hypothesisStore";
     import PlayerUsername from "$lib/components/PlayerUsername.svelte";
     import HypothesisList from "$lib/components/game/HypothesisList.svelte";
+    import AccusationPopup from "$lib/components/game/AccusationPopup.svelte";
 
     export let gameRoomId: string;
     export let username: string;
@@ -57,6 +58,32 @@
 
     function nextTurn() {
         socketStore.emit('endTurn', {})
+    }
+
+    let showAccusationPopup = false;
+
+    function openAccusationPopup() {
+        showAccusationPopup = true;
+    }
+
+    function closeAccusationPopup() {
+        showAccusationPopup = false;
+    }
+
+    onMount(() => {
+        socketStore.on(GameEvents.GAME_WON, handleWonGame)
+
+        return () => {
+            socketStore.off(GameEvents.GAME_WON, handleWonGame)
+        }
+    })
+
+    function handleWonGame({winnerId}) {
+        if (winnerId === $playerMe.id) {
+            alert('Vous avez gagné la partie !')
+        } else {
+            alert('Vous avez perdu la partie !')
+        }
     }
 
 </script>
@@ -105,7 +132,8 @@
 
             <HypothesisList {gameRoomId} playerId={$playerMe.id} />
         </div>
-        <div class="flex justify-between gap-x-2">
+        <Button on:click={openAccusationPopup} class="w-full text-xl h-16 font-silkscreen font-bold mb-2" disabled={!yourTurn}>Faire une accusation</Button>
+        <div class="flex justify-between gap-x-2 ">
             <Button class="text-xl h-16 w-1/2 font-silkscreen font-bold" disabled={$playerMe.numberOfMoveLeft !== -1 || !yourTurn || $gameStore.hasHypothesed} onclick={rollDice}>
                 <div class="flex items-center gap-x-2">
                     <Icon icon="mdi:dice" class="inline" width="2.5em" />
@@ -124,6 +152,11 @@
     </div>
 
 </div>
+
+<AccusationPopup
+        show={showAccusationPopup}
+        on:close={closeAccusationPopup}
+/>
 
 <style>
     .main-grid > div {
