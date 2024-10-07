@@ -3,22 +3,25 @@
     import { scenarioStore } from '$lib/stores/scenarioStore';
     import {socketStore} from "$lib/stores/websocketStore";
     import {gameStore} from "$lib/stores/gameStore";
+    import {Button} from "$lib/components/ui/button";
+    import {GameEvents} from "$lib/event-constants";
 
     export let roomName: string;
-    export let roomId: string;
 
     let selectedSuspect: string = '';
     let selectedWeapon: string = '';
 
     $: suspects = $scenarioStore.scenario ? $scenarioStore.scenario.suspects : [];
     $: weapons = $scenarioStore.scenario ? $scenarioStore.scenario.weapons : [];
+    $: roomId = $scenarioStore.scenario ? $scenarioStore.scenario.rooms.find(r => r.name === roomName).id : '';
 
     function handleSubmit() {
         console.log('Hypothèse:', { roomName, roomId, selectedSuspect, selectedWeapon });
-        socketStore.emit('createHypothesis', {
+        socketStore.emit(GameEvents.MAKE_ASSUPMTION, {
+            roomId,
             suspectId: selectedSuspect,
             weaponId: selectedWeapon,
-            roomId,
+            type: 'hypothesis',
         });
         gameStore.setHasHypothesed(true);
     }
@@ -48,9 +51,9 @@
             </select>
         </div>
 
-        <button type="submit" disabled={!selectedSuspect || !selectedWeapon}>
+        <Button type="submit" disabled={!selectedSuspect || !selectedWeapon}>
             Formuler l'hypothèse
-        </button>
+        </Button>
     </form>
 </div>
 
@@ -58,7 +61,6 @@
     .hypothesis-form {
         padding: 1rem;
         border: 1px solid #ccc;
-        border-radius: 4px;
     }
 
     .form-group {

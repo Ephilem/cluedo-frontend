@@ -1,86 +1,102 @@
 // playerStore.ts
-import {writable, derived, get} from 'svelte/store';
+import {derived, get, writable} from 'svelte/store';
+import { socketStore } from './websocketStore';
+import {type GameEventMap, GameEvents, type PlayersListPayload} from '$lib/event-constants';
+import type {PlayerInfo} from "$lib/types";
+import {gameStore} from "$lib/stores/gameStore";
 
-export interface Player {
-    id: string;
-    username: string;
-    ready: boolean;
-    playAs: {
-        id: string,
-        color: string,
-        name: string,
-    } | null;
-    eliminated: boolean;
-    isHost: boolean;
-}
 
 interface PlayerState {
-    players: Player[];
+    players: PlayerInfo[];
 }
 
 function createPlayerStore() {
-    const { subscribe, update, set } = writable<PlayerState>({
-        players: []
-    });
+    const { subscribe, update, set } = writable<PlayerState>(
+        { players: [] },
+        // Cette fonction est appelée lorsque le nombre d'abonnés passe de 0 à 1
+        () => {
+            // S'abonner aux événements
+            // socketStore.on('playerJoined', handlePlayerJoined);
+            // socketStore.on('playerLeft', handlePlayerLeft);
+            // socketStore.on('playerSelectSuspect', handlePlayerSelectSuspect);
+            // socketStore.on('playerSetReady', handlePlayerSetReady);
+            socketStore.on(GameEvents.PLAYERS_LIST, handlePlayerList);
+            // socketStore.on(GameEvents.PLAYER_JOINED, handlePlayerJoined);
+            // socketStore.on(GameEvents.PLAYER_LEFT, handlePlayerLeft);
+
+            // Fonction de nettoyage, appelée lorsque le nombre d'abonnés passe de 1 à 0
+            return () => {
+                socketStore.off(GameEvents.PLAYERS_LIST, handlePlayerList);
+                // socketStore.off(GameEvents.PLAYER_JOINED, handlePlayerJoined);
+                // socketStore.off(GameEvents.PLAYER_LEFT, handlePlayerLeft);
+                // socketStore.off('playerJoined', handlePlayerJoined);
+                // socketStore.off('playerLeft', handlePlayerLeft);
+                // socketStore.off('playerSelectSuspect', handlePlayerSelectSuspect);
+                // socketStore.off('playerSetReady', handlePlayerSetReady);
+            };
+        }
+    );
+
+    function setPlayers(players: PlayerInfo[]) {
+        set({ players });
+    }
+
+    function handlePlayerJoined(data: GameEventMap['playerJoined']) {
+        update(store => ({
+            players: [...store.players, data.player]
+        }));
+    }
+
+    function handlePlayerLeft(data: GameEventMap['playerLeft']) {
+        update(store => ({
+            players: store.players.filter(p => p.username !== data.username)
+        }));
+    }
+
+    function handlePlayerList(data: PlayersListPayload) {
+        console.log('handlePlayerList', data);
+        update(store => ({
+            players: data.players
+        }));
+    }
+
+    // function handlePlayerSelectSuspect(data: GameEventMap['playerSelectSuspect']) {
+    //     update(store => ({
+    //         players: store.players.map(p =>
+    //             p.id === data.playerId ? { ...p, playAs: data.suspect } : p
+    //         )
+    //     }));
+    // }
+    //
+    // function handlePlayerSetReady(data: GameEventMap['playerSetReady']) {
+    //     update(store => ({
+    //         players: store.players.map(p =>
+    //             p.id === data.playerId ? { ...p, ready: data.isReady } : p
+    //         )
+    //     }));
+    // }
+
+    function getPlayerMe() {
+        const gameInfo = get(gameStore);
+        if (!gameInfo) {
+            return null;
+        }
+
+        return get({ subscribe }).players.find(p => p.username === gameInfo.playingAs);
+    }
 
     return {
         subscribe,
-        addPlayer: (player: Player) => update(store => {
-            const players = [...store.players, player];
-            return { ...store, players };
-        }),
-        removePlayer: (playerId: string) => update(store => {
-            const players = store.players.filter(p => p.id !== playerId);
-            return { ...store, players };
-        }),
-        setPlayers: (players: Player[]) => set({players}),
-        updatePlayer: (playerId: string, updates: Partial<Player>) => update(store => {
-            const players = store.players.map(p =>
-                p.id === playerId ? { ...p, ...updates } : p
-            );
-            return { ...store, players };
-        }),
-        setReady: (playerId: string, isReady: boolean) => update(store => {
-            const players = store.players.map(p =>
-                p.id === playerId ? { ...p, ready: isReady } : p
-            );
-            return { ...store, players };
-        }),
-        setPlayAs: (playerId: string, suspect: { id: string, color: string, name: string } | null) => update(store => {
-            const players = store.players.map(p =>
-                p.id === playerId ? { ...p, playAs: suspect } : p
-            );
-            return { ...store, players };
-        }),
-        setEliminated: (playerId: string, isEliminated: boolean) => update(store => {
-            const players = store.players.map(p =>
-                p.id === playerId ? { ...p, isEliminated } : p
-            );
-            return { ...store, players };
-        }),
-        reset: () => update(() => ({ players: [] })),
-        getPlayerBySuspectName: (suspectName: string): Player | undefined => {
-            const store = get({ subscribe });
-            return store.players.find(p => p.playAs?.name === suspectName);
-        },
-        getPlayerBySuspectId: (suspectId: string): Player | undefined => {
-            const store = get({ subscribe });
-            return store.players.find(p => p.playAs?.id === suspectId);
-        }
+        // ... autres méthodes du store
     };
 }
 
 export const playerStore = createPlayerStore();
 
-// Derived stores
-export const activePlayers = derived(playerStore, $playerStore =>
-    $playerStore.players.filter(p => p.playAs !== null && !p.eliminated)
-);
+export const playerMe = derived(playerStore, $playerStore => {
+    return $playerStore.players.find(p => p.username === get(gameStore).playingAs);
+})
 
-export const spectators = derived(playerStore, $playerStore =>
-    $playerStore.players.filter(p => p.playAs === null)
-);
-
-export const eliminatedPlayers = derived(playerStore, $playerStore =>
-    $playerStore.players.filter(p => p.eliminated)
-);
+export const playersNeedToDisprove = derived(playerStore, $playerStore => {
+    return $playerStore.players.filter(p => p.needToDisprove);
+})

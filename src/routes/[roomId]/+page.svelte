@@ -12,6 +12,9 @@
     import CenterRow from "$lib/components/CenterRow.svelte";
     import { socketStore } from "$lib/stores/websocketStore";
     import GameRoomPlato from "$lib/components/GameRoomPlato.svelte";
+    import MessageBox from "$lib/components/MessageBox.svelte";
+    import {scenarioStore} from "$lib/stores/scenarioStore";
+    import {playerStore} from "$lib/stores/playerStore";
 
     export let data: PageData;
     $: gameRoomId = data.gameRoomId;
@@ -38,6 +41,11 @@
     function manuallySetUsername() {
         console.log(username);
         needUsername = false;
+
+        // ajouter dans l'url le username au cas ou il y a un refresh
+        const url = new URL(window.location.href);
+        url.searchParams.set('username', username);
+        window.history.replaceState({}, '', url);
         initWebsocket();
     }
 </script>
@@ -66,10 +74,18 @@
             <Logo />
             <div>Error in socket....</div>
         </CenterRow>
+    {:else}
+        <CenterRow>
+            <Logo />
+            <Icon icon="mdi:loading" class="animate-spin text-foreground text-4xl"/>
+        </CenterRow>
     {/if}
 {:else}
     <CenterRow>
         <Logo />
+        <Icon icon="mdi:loading" class="animate-spin text-foreground text-4xl"/>
+    </CenterRow>
+    <MessageBox title="Besoin d'un pseudo">
         <p>Please enter your username to join the game.</p>
         <div class="flex">
             <Input placeholder="Username" class="max-w-xs" name="username" bind:value={username} />
@@ -77,5 +93,5 @@
                 <Icon icon="mdi:chevron-right" width="18px"/>
             </Button>
         </div>
-    </CenterRow>
+    </MessageBox>
 {/if}

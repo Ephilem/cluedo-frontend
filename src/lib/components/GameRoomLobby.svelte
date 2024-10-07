@@ -29,11 +29,11 @@
 
     function selectSuspect(s: Suspect) {
         if (takenSuspects.includes(s.id)) return;
-        socketStore.emit('selectSuspect', s.id);
+        socketStore.emit('selectSuspect', { suspectId: s.id });
     }
 
     function toggleReady() {
-        socketStore.emit('setReady', !$currentPlayer.ready);
+        socketStore.emit('setReady', { ready: !$currentPlayer.ready });
     }
 
     function startGame() {
@@ -41,20 +41,25 @@
     }
 </script>
 
-<div class="flex flex-col items-center gap-y-5">
+<div class="flex flex-col items-center gap-y-5 w-full">
     <h2 class="font-bold">joueurs connectes</h2>
-    {#each $playerStore.players as player}
-        <div class="grid border-b-2 border-foreground w-full grid-rows-1 grid-cols-2 items-center gap-y-1">
-            <PlayerUsername userId={player.id} />
-            <div class="place-self-end">
-                {#if player.ready}
-                    <div class="text-primary-foreground bg-foreground px-2">
-                        READY
-                    </div>
-                {/if}
+
+    {#if $playerStore.players.length === 0}
+        <span>Chargement...</span>
+    {:else}
+        {#each $playerStore.players as player}
+            <div class="grid border-b-2 border-foreground w-full grid-rows-1 grid-cols-2 items-center gap-y-1">
+                <PlayerUsername userId={player.id}/>
+                <div class="place-self-end">
+                    {#if player.ready}
+                        <div class="text-primary-foreground bg-foreground px-2">
+                            READY
+                        </div>
+                    {/if}
+                </div>
             </div>
-        </div>
-    {/each}
+        {/each}
+    {/if}
 
     {#each Array(emptySlots) as _, i}
         <div class="grid border-b-2 border-muted-foreground w-full grid-rows-1 grid-cols-2 items-center gap-y-1 opacity-50">
@@ -68,7 +73,7 @@
                 <div class={`border-2 w-28 text-center border-foreground p-2  ${takenSuspects.includes(s.id) ? "opacity-50 cursor-not-allowed" : "hover:bg-foreground hover:text-primary-foreground"}`}
                      role="button" on:click={() => selectSuspect(s)}
                      tabindex="-1" on:keydown={() => selectSuspect(s)}>
-                    <Icon icon="@local:pixelated:avatar" class="mx-auto" width="3em" color={s.color}/>
+                    <Icon icon="mdi:user" class="mx-auto" width="3em" color={s.color}/>
                     {s.name}
                 </div>
             {/each}

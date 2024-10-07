@@ -1,11 +1,7 @@
 // cardStore.ts
 import { writable, derived, get } from 'svelte/store';
+import type {Card} from "$lib/types";
 
-export interface Card {
-    id: string;
-    type: 'Suspect' | 'Weapon' | 'Room';
-    name: string;
-}
 
 interface CardState {
     cards: Card[];

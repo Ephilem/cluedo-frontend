@@ -16,11 +16,12 @@
 
 {#if user}
     <span class="inline flex items-center gap-x-1">
+
         {#if user.isHost}
             <Icon icon="mdi:crown" class="text-warning"/>
         {/if}
         {#if user.playAs}
-            <Icon icon="@local:pixelated:avatar" color={user.playAs.color}/>
+            <Icon icon="mdi:user" color={user.playAs.color}/>
         {/if}
         {user.username}
     </span>

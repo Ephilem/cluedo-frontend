@@ -1,35 +1,52 @@
 <script lang="ts">
-    import {disproveStatus, type DisproveStatus} from "$lib/stores/hypothesisStore";
     import {playerStore} from "$lib/stores/playerStore";
     import {scenarioStore} from "$lib/stores/scenarioStore";
     import {findRoomNameById} from "$lib/utils";
     import {Button} from "$lib/components/ui/button";
+    import type {AssumptionInfo} from "$lib/types";
+    import {assumptionStore} from "$lib/stores/hypothesisStore";
+    import {socketStore} from "$lib/stores/websocketStore";
+    import {GameEvents} from "$lib/event-constants";
+    import PlayerUsername from "$lib/components/PlayerUsername.svelte";
 
 
-    export let disproveData: DisproveStatus;
+    export let disproveData: AssumptionInfo;
 
     $: playerName = $playerStore.players.find(p => p.id === disproveData.playerId).username;
     $: weaponName = $scenarioStore.scenario.weapons.find(w => w.id === disproveData.weaponId).name;
     $: suspectName = $scenarioStore.scenario.suspects.find(s => s.id === disproveData.suspectId).name;
-    $: roomsName = findRoomNameById($scenarioStore.scenario.rooms, disproveData.roomId);
+    $: roomsName = $scenarioStore.scenario.rooms.find(r => r.id === disproveData.roomId).name;
 
     function cancel() {
-        disproveStatus.set(null);
+        socketStore.emit(GameEvents.DISPROVE_HYPOTHESIS, {
+            card: null,
+            assumptionId: disproveData.id
+        });
+
+        assumptionStore.setAssumptionToDisprove(null);
+
     }
 </script>
 
 <div class="disrpove-text">
-    {playerName} pense que le meutrié est {suspectName} qui a utiliser {weaponName} dans {roomsName}
-    <Button onclick={cancel}>
-        J'ai rien pour annulée
-    </Button>
+    <h2 ><PlayerUsername userId={disproveData.playerId} /> a fait l'hypothese suivante</h2>
+    <div class="">
+        " Je pense que c'est <strong>{suspectName}</strong> avec <strong>{weaponName}</strong> dans <strong>{roomsName}</strong> "
+    </div>
+    <div>
+        Cliquer sur une carte possible pour contredire
+    </div>
+    <div class="flex justify-end">
+        <Button onclick={cancel}>
+            J'ai rien pour contredire
+        </Button>
+    </div>
 </div>
 
 <style>
     .disrpove-text {
         padding: 1rem;
         border: 1px solid #ccc;
-        border-radius: 4px;
     }
 </style>
 

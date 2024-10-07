@@ -13,7 +13,7 @@
     <h2 class="font-bold">{gameRoom.name}</h2>
     <div class="flex justify-end items-baseline">
         {gameRoom.numberOfPlayers}
-        <Icon icon="@local:pixelated:avatar" />
+        <Icon icon="mdi:user" />
     </div>
     <div>
         Status: {gameRoom.status}
